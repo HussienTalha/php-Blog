@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ""
+      dockerfile: Dockerfile
+    container_name: blog-app
+    restart: always
+    working_dir: /var/www/
+    volumes:
+      - ../src:/var/www
+    ports:
+      - "9000:9000"  
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:1.19-alpine
+    container_name: blog-nginx
+    restart: always
+    ports:
+      - 8000:80
+    volumes:
+      - ../src:/var/www
+      - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      - app
+    networks:
+      - app-network
+
+
+  mysql:
+    image: mariadb:10.6
+    container_name: blog-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: myapp
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./storage/mysql:/var/run/mysqld
+      - ./storage/mysql_data:/var/lib/mysql 
+  
+networks:
+   app-network:
+       driver: bridge
