@@ -41,6 +41,8 @@ services:
     volumes:
       - ./storage/mysql:/var/run/mysqld
       - ./storage/mysql_data:/var/lib/mysql 
+    networks:
+      - app-network
   
 networks:
    app-network:
