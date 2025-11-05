@@ -19,7 +19,7 @@ class CRUD
 		return $instance;
 	}
 	
-	public function readAll($column , $table)
+	public function readAll($table, $column)
 	{
 		$query = "SELECT :column FROM :table";
 		$stmt = $db -> prepare($query);
@@ -33,9 +33,9 @@ class CRUD
 			)
 	}
 
-	public function readByColumn ($column, $val1, $val2, $table)
+	public function readByColumn ($table, $column, $condition, $val2)
 	{
-		$query = "SELECT :column FROM :table WHERE :val1 = :val2";
+		$query = "SELECT :column FROM :table WHERE :condition = :val2";
 		$stmt = $db -> prepare($query);
 		return $stmt -> execute
 			(
@@ -45,7 +45,7 @@ class CRUD
 					'val1' => $val1,
 					'val2' => $val2
 				]
-			)
+			);
 	
 	}
 
@@ -58,9 +58,15 @@ class CRUD
 				[
 					'table' => $query
 				]
-			)
+			);
 	}
-	public function updateColumn($table, $column, $val)
+
+	public function deleteRecord($table, $column, $val)
+	{
+		$query = "DELETE FROM :table WHERE";
+	
+	}
+	public function updateValue($table, $column, $val)
 	{
 		$query = "UPDATE :table SET :column = :val";
 		$stmt = $db -> prepare($qurey);
@@ -71,7 +77,7 @@ class CRUD
 					'column' => $column,
 					'val' => $val
 				]
-			)
+			);
 	}
 
 }
