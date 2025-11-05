@@ -2,42 +2,43 @@
 
 namespace App;
 
-class Router{
+class Router
+{
 	protected array $routes = [];
 	public Request $request;
 	public Response $response;
 	public View $view;
 	public function __construct( Request $req, Response $res)
 	{
-		
 		$this -> request = $req;
 		$this -> response = $res;
 	}
 	public function post(
 		string $route,
-		callable|array $action
+		string|callable|array $action
 	)
 	:self
 	{
-		return $this -> register(post , $route , $action);
+		return $this -> register('post', $route , $action);
 	}
 
 
 	public function get(
 		string $route,
-		callable|array $action
+		callable|array|string $action
 	)
 	:self
 	{
-		return $this -> register(get , $route , $action);
+		return $this -> register('get' , $route , $action);
 	}
 
 
 
 	public function register(
+		
 		string $method,
 		string $route,
-		callable|self $action
+		callable|self|string|array $action
 	)
 	:self
 	
@@ -47,18 +48,18 @@ class Router{
 	}
 
 
-
+	
 	public function resolve()
 	{
 		$route = $this -> request -> getPath();
 		$method = $this -> request -> getMethod();
-
 		$action  = $this -> routes[$method][$route] ?? false ;
-
 		if ($action === false)
 		{
 			$this -> response -> setStatusCode(404);
-			echo " 404 Not Found";
+			echo "404";
+			//$this -> view = new View();
+			//$this -> view -> render('_404');
 			exit;
 		}
 		if (is_callable($action))
@@ -76,7 +77,8 @@ class Router{
 
 				if (method_exists($class, $method))
 			  	{
-                			return call_user_func_array([$class, $method], []);
+                			return call_user_func([$class, $method], $this -> request);
+
  		         	 }
          		}
         	}
@@ -85,10 +87,7 @@ class Router{
 
 		{
 
-	  		$this -> view = new View() ;
-			$this -> view -> render($action);
-			return $this -> view;
+			return App::$app -> view -> render ($action);
 		}
 	}
-
 }

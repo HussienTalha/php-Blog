@@ -3,14 +3,18 @@ namespace App;
 
 session_start();
 class App{
+	public static App $app;
 	private static DB $db;
 	public Router $router;
 	public Request $request;
 	public Response $response;
-	public tfunction __construct(){
-		
+	public View $view;
+	public function __construct(){
+
+		self::$app =$this ;	
 		$this -> request = new Request();
 		$this -> response = new Response();
+		$this -> view = new View();
 		$this -> router = new Router($this -> request , $this -> response);
 		static::$db = new DB();
 
@@ -21,12 +25,7 @@ class App{
 	}
 
 	public function run(){
-		$this -> router -> resolve(
-			$_SERVER["REQUEST_URI"],
-			strtolower($_SERVER["REQUEST_METHOD"])
-		);
-
-	
+		echo $this -> router -> resolve();
 	}
 
 }

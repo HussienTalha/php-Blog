@@ -1,6 +1,4 @@
 <?php
-
-
 spl_autoload_register(function($class){
     $path = __DIR__ .'/../'.lcfirst(str_replace('\\','/',$class)).'.php';
     require $path;
@@ -8,6 +6,11 @@ spl_autoload_register(function($class){
 	    that hasn't been loaded it recieves the fully qualified class name and loads */
 }); 
 
-$app = new App\App();
 
-    $app->run();
+$app = new App\App();
+$app -> router -> get('/',[Controllers\SiteController::class,'getHome']);
+$app -> router -> get('/login',[Controllers\AuthController::class,'login']);
+$app -> router -> post('/login',[Controllers\AuthController::class,'login']);
+$app -> router -> get('/register',[Controllers\AuthController::class,'register']);
+$app -> router -> post('/register',[Controllers\AuthController::class,'register']);
+$app->run();
