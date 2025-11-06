@@ -22,37 +22,39 @@ class CRUD
 	public function readAll($table, $column)
 	{
 		$query = "SELECT :column FROM :table";
-		$stmt = $db -> prepare($query);
+		$stmt = $this -> db -> prepare($query);
 
-		return $stmt -> execute
+		$stmt -> execute
 			(
 				[
 				'column' => $column,
 				'table' => $table
 				]
-			)
+			);
+		$stmt -> fetchAll(PDO::FETCH:_ASSOC);
 	}
 
-	public function readByColumn ($table, $column, $condition, $val2)
+	public function readByColumn ($table, $column, $condition, $val1)
 	{
-		$query = "SELECT :column FROM :table WHERE :condition = :val2";
-		$stmt = $db -> prepare($query);
-		return $stmt -> execute
+		$query = "SELECT :column FROM :table WHERE :condition = :val1";
+		$stmt = $this -> db -> prepare($query);
+		$stmt -> execute
 			(
 				[
 					'column' => $column,
 					'table' => $table,
-					'val1' => $val1,
-					'val2' => $val2
+					'condition' => $val1,
+					'val1' => $val1
 				]
 			);
+		$stmt -> fetchAll(PDO::FETCH_ASSOC);
 	
 	}
 
 	public function deleteAll($table)
 	{
 		$query = "TRUNCATE TABLE :table";
-		$stmt = $db -> prepare($query);
+		$stmt = $this -> db -> prepare($query);
 		return $stmt -> execute
 			(
 				[
@@ -69,7 +71,7 @@ class CRUD
 	public function updateValue($table, $column, $val)
 	{
 		$query = "UPDATE :table SET :column = :val";
-		$stmt = $db -> prepare($qurey);
+		$stmt = $this -> db -> prepare($qurey);
 		return $stmt -> execute
 			(
 				[
