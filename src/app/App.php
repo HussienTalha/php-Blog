@@ -4,7 +4,7 @@ namespace App;
 session_start();
 class App{
 	public static App $app;
-	private static DB $db;
+	public static DB $db;
 	public Router $router;
 	public Request $request;
 	public Response $response;

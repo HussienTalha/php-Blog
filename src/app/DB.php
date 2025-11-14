@@ -6,7 +6,7 @@ private PDO $pdo;
 public function __construct() {
     try {
         $this->pdo = new PDO(
-            'mysql:host=mysql;dbname=myapp;charset=utf8mb4',
+            'mysql:host=mysql;dbname=my_db;charset=utf8mb4',
             'root',
             'root',
         );

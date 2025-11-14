@@ -1,10 +1,10 @@
 <?php ?>
 <html>
 <head>
-<title> home </title>
+<title> Profile </title>
 </head>
 <body>
-<h1 style= "text-align : center;"> Home </h1>
+<h1 style= "text-align : center;"> Profile Page </h1>
 <div class = "container">
 <?php 
 $posts = [];

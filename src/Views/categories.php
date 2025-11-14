@@ -1,13 +1,12 @@
 <?php ?>
 <html>
 <head>
-<title> home </title>
+<title> Categories </title>
 </head>
 <body>
-<h1 style= "text-align : center;"> Home </h1>
-<div class = "container">
+<h1 style="text-align:center;">Categories</h1>
+<div class="container">
 <?php 
-$posts = [];
 foreach ($posts as $post) {?>
 <div class ="card">
 <img src = "<?php $post["img"] ?>" alt = "img" style ="width: 100%;">
