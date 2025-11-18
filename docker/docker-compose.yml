@@ -9,7 +9,7 @@ services:
     restart: always
     working_dir: /var/www/
     volumes:
-      - ../src:/var/www
+      - ../:/var/www
     ports:
       - "9000:9000"  
     networks:
@@ -22,7 +22,7 @@ services:
     ports:
       - 8000:80
     volumes:
-      - ../src:/var/www
+      - ../:/var/www
       - ./nginx:/etc/nginx/conf.d
     depends_on:
       - app

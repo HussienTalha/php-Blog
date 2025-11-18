@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__."../core/DB.php";
+require_once __DIR__."/../core/DB.php";
 use PDO;
 class UserProfile
 {
@@ -16,6 +16,7 @@ class UserProfile
 	public function getUserId()
 	{
 		//todo after auth	
+		return $id = 0;
 	}
 
 	
@@ -36,12 +37,13 @@ class UserProfile
 		{
 			if ($newPasswd1 === $newPasswd2)
 			{
-				$query = "UPDATE users SET password = :newpasswd";
+				$query = "UPDATE users SET password = :newpasswd WHERE ID = :id";
 				$stmt = $this->pdo->prepare($query);
 				$stmt->execute
 					(
 						[
-							'newpasswd' => $newPasswd1
+							'newpasswd' => $newPasswd1,
+							'id' => $id
 						]
 					);
 			}
@@ -60,7 +62,8 @@ class UserProfile
 			$stmt->execute
 				(
 					[
-						'email' => $email
+						'email' => $email,
+						'id' => $id
 					]
 				);
 			return "email updated";
@@ -88,7 +91,8 @@ class UserProfile
 			$stmt->execute
 				(
 					[
-						'username' => $userName
+						'username' => $userName,
+						'id' => $id
 					]
 				);
 			return "username updated";

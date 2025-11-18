@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'../core/DB.php';
+require_once __DIR__.'/../core/DB.php';
 class UserPosts
 {
 
@@ -47,7 +47,7 @@ class UserPosts
 			return "category not found";
 	}
 	//validate user id to preform actoin
-	public function validate($userId)
+	public function validateUser($userId)
 	{
 		//todo after authentication
 	
@@ -117,7 +117,7 @@ class UserPosts
 	public function deletePost($postId)
 	{
 		$userId = $this->getUserId($postId);
-		if ($this->validate($userId))
+		if ($this->validateUser($userId))
 		{
 			$query = "DELETE FROM posts WHERE post_id = :postId";
 			$stmt = $this->pdo->prepare($query);
@@ -136,7 +136,7 @@ class UserPosts
 	//edit post
 	public function editPost($userId, $postId, $title, $content, $status, $image)
 	{
-		if ($this -> validate($userId))
+		if ($this -> validateUser($userId))
 		{
 		$query = "UPDATE posts SET title = :title ,content = :content , status = :status , image = :image WHERE post_Id = :postId";
 		$stmt = $this->pdo->prepare($query);
