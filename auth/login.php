@@ -15,8 +15,12 @@ class login
 			$this->pdo = $this->db->getConnection();
 		}
 
-		public function getUser($account, $password)
+		public function getUser()
 		{
+			$email = trim($_POST['email']);
+			$username = trim($_POST['username']);
+			$password = trim($_POST['password']);
+
 			try
 			{
 				$query = "SELECT * FROM users WHERE email = :email OR username = :username";
@@ -24,8 +28,8 @@ class login
 				$stmt->execute
 					(
 						[
-							'email' => $account,
-							'username' => $account
+							'email' => $email,
+							'username' => $username
 						]
 					);
 				$user = $stmt->fetch(PDO::FETCH_ASSOC);
