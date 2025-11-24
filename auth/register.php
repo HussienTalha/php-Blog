@@ -48,7 +48,7 @@ class Register
 		 */
 		if (! empty ($_SESSION['validationError']))
 		{
-			header ("location : register.php");
+			header ("location: register.php");
 			exit ;
 		}
 		$passwd = password_hash($passwd, PASSWORD_DEFAULT);
