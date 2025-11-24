@@ -5,6 +5,7 @@ use pdo;
 
 class users
 {
+	session_start();
 	public DB $db;
 	public pdo $pdo;
 	public int $id;
@@ -15,8 +16,9 @@ class users
 		$this->pdo = $this->db->getConnection();
 	}
 
-	public function validateAdmin($id = 0) //make default value the id from the session
+	public function validateAdmin() //make default value the id from the session
 	{
+		$this->id = $SESSION['account']['admin'];
 		$query = "SELECT admin FROM users WHERE ID = :id";
 		$stmt = $this->pdo->prepare($query);
 		$stmt->execute
@@ -53,7 +55,21 @@ class users
 	public function createUser($userName, $email, $passwd, $admin)
 	{	
 		if ($this->validateAdmin()) 
-		{
+		{	
+			
+			$username = trim($username);
+			$email = trim($email);
+			$passwd = trim($passwd);
+			$confirmPW = trim($confirmPW);
+
+			if ($passwd !== $confirmPW)
+			{
+				$_SESSION['state'] = 'enter the password correctly';
+				header("location : ../views/register.php");
+				return;
+			}
+			$passwd = password_hash($passwd, PASSWORD_DEFAULT);
+		
 			try
 			{
 				$query = "INSERT INTO users (username, email, password, admin) values (:username, :email, :password, :admin)";
@@ -67,19 +83,24 @@ class users
 							'admin' => $admin
 						]
 					);
-				return "user created successfully";
+				$_SESSION['state'] = 'user created successully';
+				header("location : ../views/dashboard";
+				return;
 			}
 			catch (PDOException $e)
 			{
-				return "unexpected error $e";
+				$_SESSION['state'] ="unexpected error";
+				header("location : ../views/dashboard";
+				return;	
 			}
-		}
 		else
-		{
-			return "you're not authorized to create new user";
-		}
+			{
+				$_SESSION['state'] = "you're not authorized to create new user";
+				header("location : ../views/dashboard";
+				return;
+			}
 
-	}
+		}
 	public function deleteUser($username)
 	{
 		$userId = $this->getUserId($username);
@@ -88,7 +109,9 @@ class users
 		{
 			if ($this->validateAdmin($userId))
 			{
-				return "not authorized to delete admin's profile";
+				$_SESSION['state'] ="not authorized to delete admin's profile";
+				header("location : ../views/dashboard";
+				return;
 			}
 			else
 			{
@@ -102,17 +125,23 @@ class users
 							'id' => $userId
 						]
 					);
-				return "users is deleted";
+				$_SESSION['state'] = "users is deleted";
+				header("location : ../views/dashboard";
+				return;
 			}
 			catch (PDOException $e)
 			{
-				return "unexpected error $e";
+				 $_SESSION['state'] ="unexpected error $e";
+				 header("location : ../views/dashboard";
+				 return;
 			}
 			}
 		}
 		else 
 		{
-			return "not authorized to delete user";
+			$_SESSION['state'] = "not authorized to delete user";
+			header("location : ../views/dashboard";
+			return;
 		}
 		}
 	}

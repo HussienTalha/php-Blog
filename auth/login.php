@@ -2,9 +2,8 @@
 session_start();
 
 require_once __DIR__.'/../core/DB.php';
-use pdo;
 
-class login
+class Login
 {
 
 		public DB $db;
@@ -18,26 +17,24 @@ class login
 		public function getUser()
 		{
 			$email = trim($_POST['email']);
-			$username = trim($_POST['username']);
 			$password = trim($_POST['password']);
 
 			try
 			{
-				$query = "SELECT * FROM users WHERE email = :email OR username = :username";
+				$query = "SELECT * FROM users WHERE email = :email";
 				$stmt = $this->pdo->prepare($query);
 				$stmt->execute
 					(
 						[
 							'email' => $email,
-							'username' => $username
 						]
 					);
 				$user = $stmt->fetch(PDO::FETCH_ASSOC);
 				if (! $user)
 				{
-					$_SESSION['error'] = "wrong username or email" ;
-					header("location : /../views/login.php");
-					return;
+					$_SESSION['error'] = "wrong email" ;
+					header("location: login.php");
+					exit;
 				}
 				else
 				{
@@ -45,28 +42,29 @@ class login
 					if (! $pass)
 					{
 						$_SESSION['error'] = "wrong password";
-						header("location : /../views/login.php");
-						return;
+						header("location: login.php");
+						exit;
 					}
 					else
 					{
 						$_SESSION['account'] = $user;
 						if ($_SESSION['account']['admin'])
 						{
-							header("location : /../views/dashboard.php");
-							return;
+							header("location: dashboard.php");
+							exit;
 						}
 						else
-							header("location : /../views/home.php");
-						return;
+							header("location: home.php");
+							echo $_SESSION['account'];
+						exit;
 					}
 				}
 			}
 			catch (PDOException $e)
 			{
 				$_SESSION['error'] =  "unexpected error $e";
-				header("location : /../views/login.php");
-				return;
+				header("location: login.php");
+				exit;
 			}
 		}
 
