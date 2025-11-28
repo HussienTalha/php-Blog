@@ -1,3 +1,6 @@
+<?php
+define("Root","http://localhost:8000");
+?>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -16,19 +19,20 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="http://localhost:8000">Home</a>
+	<a class="nav-link active" aria-current="page" href=<?=Root;?>>Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link active" href="http://localhost:8000/views/login.php">Login</a>
+	<a class="nav-link active" href="<?=Root?>/views/login.php">Login</a>
         </li>
         <li class="nav-item">
-	<a class="nav-link active" href="http://localhost:8000/views/register.php">Register</a>
+	<a class="nav-link active" href="<?=Root?>/views/register.php">Register</a>
 	</li>
 	<li class="nav-item">
-	<a class="nav-link active" href="/profile">Profile</a>
+	<a class="nav-link active" href="<?=Root?>/views/profile.php">Profile</a>
         </li>
 	<li class=nav-item">
-	<a class="nav-link active" href="/categories">Categories</a>
+	<a class="nav-link active" href="<?=Root?>/views/categories.php">Categories</a>
+
 	</li>
       </ul>
       <form class="d-flex" role="search">
@@ -39,4 +43,4 @@
   </div>
   </nav>
 </body>
-  </html>
+</html>

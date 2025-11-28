@@ -5,13 +5,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
 	$login = new Login();
 	$login->getUser();
 }
-require_once __DIR__.'/layouts/main.php';
 ?>
 <html>
 <head>
 <title> login </title>
 </head>
 <body>
+<?= require_once __DIR__.'/layouts/main.php';?>
 <div class="mb-3">
 <?php if (! empty($_SESSION['state'])): ?>
 <p> <?= htmlspecialchars($_SESSION['state']); ?> </p>
