@@ -1,14 +1,14 @@
 <?php
-use PDO;
-
-require_once __DIR__."../core/DB.php";
-
+if (session_status() !== PHP_SESSION_ACTIVE)
+{
+session_start();
+}
+require_once __DIR__."/../core/DB.php";
+require_once __DIR__."/../core/config.php";
 class Category
 {
 	public DB $db;
 	Public pdo $pdo;
-	public int $id;
-	//todo assign id variable to the user id stored in the session after making the auth
 
 	public function __construct()
 	{
@@ -18,22 +18,13 @@ class Category
 
 	public function validateAdmin()
 	{
-		$query = "SELECT admin FROM users WHERE ID = :id";
-		$stmt = $this->pdo->prepare($query);
-		$stmt->execute
-			(
-				[
-					'id' => $this->id
-				]
-			);
-		$admin = $stmt->fetch();
 
-		if ($admin)
+		if ($_SESSION['account']['ID'])
 		{
-			return $admin;
+			return true;
 		}
-		else 
-			return null;
+		else
+			false;
 	}
 
 	public function addCategory($categoryName)
@@ -50,11 +41,18 @@ class Category
 							'categoryName' => $categoryName
 						]
 					);
+				if ($stmt->rowCount() > 0)
+				{
 				return "category added succefully";
+				}
 			}
 			catch (PDOException $e)
 			{
-				return "unexpected error happened";
+				if ($e->errorInfo[1] == 1062)
+				{
+					return "category already exists";
+				}
+				return "unexpected error happened $e";
 			}
 		}
 		else
@@ -69,13 +67,20 @@ class Category
 			{
 				$query = "DELETE FROM categories WHERE category_name = :categoryName";
 				$stmt = $this->pdo->prepare($query);
-				$stmt->execute
+				$count = $stmt->execute
 					(
 						[
 							'categoryName' => $categoryName
 						]
 					);
+				if ($count === 1)
+				{
 				return "category deleted";
+				}
+				else if($count === 0)
+				{
+				return "the category $categoryName don't exist";
+				}
 			}
 			catch (PDOException $e)
 			{
@@ -93,9 +98,13 @@ class Category
 	{
 		if ($this->validateAdmin())
 		{
+			if ($oldCategory === $newCategory)
+			{
+				return "you entered the same old name";
+			}
 			try
 			{
-				$query = "UPDATE categories set category_name = :newCategory WHERE category_name = oldCategory";
+				$query = "UPDATE categories set category_name = :newCategory WHERE category_name = :oldCategory";
 				$stmt = $this->pdo->prepare($query);
 				$stmt->execute
 					(
@@ -109,6 +118,10 @@ class Category
 			}
 			catch (PDOException $e)
 			{
+				if ($e->errorInfo[1] == 1062)
+				{
+					return "you entered a category that already exists";
+				}
 				return "unexpected error $e";
 			}
 
