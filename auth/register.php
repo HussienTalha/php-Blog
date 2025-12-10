@@ -1,6 +1,10 @@
 <?php
+if (session_status() !== PHP_SESSION_ACTIVE)
+{
 session_start();
+}
 require_once __DIR__.'/../core/DB.php';
+require_once __DIR__."/../core/config.php";
 
 class Register
 {
@@ -80,39 +84,44 @@ class Register
 	{	
 		if (! isset($_POST['password']))
 		{
-			$this->errors['password'] = "enter a password";
-			return $_SESSION['validationError'] = $this->errors;
-
-		}
+        $this->errors['password'] = "Enter a password";
+        $_SESSION['validationError'] = $this->errors;
+        return ;
+    	}
 		if (! isset($_POST['confirmPassword']))
 		{
 			$this->errors['password'] = "confirm the password";
-			return $_SESSION['validationError'] = $this->errors;
+			 $_SESSION['validationError'] = $this->errors;
+			 return;
 
 		}
 		if ($password !== $confirmPassWD)
 		{
 			$this->errors['password'] = 'enter the password correctly';
-			return $_SESSION['validationError'] = $this->errors;
+			 $_SESSION['validationError'] = $this->errors;
 
+			 return;
 		}
 		if (strpbrk($password ,"';\\<>&%!|#$") !== false)
 		{
 			$this->errors['password'] = " password can't have any of these chrchters \"';\\<>&%!|#$";
-			return $_SESSION['validationError'] = $this->errors;
+			 $_SESSION['validationError'] = $this->errors;
+			 return;
 
 		}
 		if (strlen($password)< 6)
 		{
 			$this->errors['password'] = "password is too short must be at least 6" ;
-			return $_SESSION['validationError'] = $this->errors;
+			 $_SESSION['validationError'] = $this->errors;
+			 return;
 
 		}
 
 		if (strlen($password)>16)
 		{
 			$this->errors['password'] = "password is too long" ;
-			return $_SESSION['validationError'] = $this->errors;
+			 $_SESSION['validationError'] = $this->errors;
+			 return;
 
 		}
 
@@ -122,13 +131,15 @@ class Register
 		if (! isset($_POST['email']))
 		{
 			$this->errors['email'] = "email required";
-			return $_SESSION['validationError'] = $this->errors;;
+			$_SESSION['validationError'] = $this->errors;
+			return;
 
 		}
 		if (! filter_var($email, FILTER_VALIDATE_EMAIL))
 		{
 			$this->errors['email'] = "enter valid email";
-			return $_SESSION['validationError'] = $this->errors;;
+			$_SESSION['validationError'] = $this->errors;;
+			return;
 		}
 		$query = "SELECT email FROM users WHERE email = :email";
 		$stmt = $this->pdo->prepare($query);
@@ -141,12 +152,14 @@ class Register
 		if (($stmt->fetch()) !=false)
 		{
 			$this->errors['email'] = "email already exist";
-			return $_SESSION['validationError'] = $this->errors;;
+			$_SESSION['validationError'] = $this->errors;;
+			return;
 		}
 		if (strpbrk($email , "\"';\\<>&%!|#$") !== false)
 		{
 			$this->errors['email'] = "email can't have these \"';\\<>&%!|#$ charchters";
-			return $_SESSION['validationError'] = $this->errors;;
+			$_SESSION['validationError'] = $this->errors;;
+			return;
 		}
 
 
@@ -158,13 +171,15 @@ class Register
 		if (! isset($_POST['username']))
 		{
 				$this->errors['username'] = "email required";
-				return $_SESSION['validationError'] = $this->errors;;
+				 $_SESSION['validationError'] = $this->errors;
+				 return;
 				
 		}
 		if (strpbrk($username , "\"';\\<>&%!|#$") !== false)
 		{
 			$this->errors['username'] = "username can't have these \"';\\<>&%!|#$ charchters";
-			return $_SESSION['validationError'] = $this->errors;;
+			 $_SESSION['validationError'] = $this->errors;
+			 return;
 		}
 
 		$query = "SELECT username FROM users WHERE username = :username";
@@ -178,12 +193,14 @@ class Register
 		if (($stmt->fetch()) != false)
 		{
 			$this->errors['username'] = "username already exist";
-			return $_SESSION['validationError'] = $this->errors;;
+			 $_SESSION['validationError'] = $this->errors;
+			 return;
 		}
 	if (strlen($username)>16)
 		{
 			$errors['username'] = "username is too long" ;
-			return $_SESSION['validationError'] = $this->errors;;
+			 $_SESSION['validationError'] = $this->errors;
+			 return;
 		}
 		return true;
 	}
