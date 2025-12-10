@@ -1,6 +1,11 @@
 <?php
+if (session_status() !== PHP_SESSION_ACTIVE)
+{
 session_start();
+}
 require_once __DIR__."/../core/DB.php";
+require_once __DIR__."/../core/config.php";
+
 class UserProfile
 {
 	public DB $db;
@@ -13,6 +18,20 @@ class UserProfile
 	}
 
 	//edit profile function
+
+	public function getUser($email)
+	{
+
+		$query = "SELECT * FROM users WHERE email = :email";
+				$stmt = $this->pdo->prepare($query);
+				$stmt->execute
+					(
+						[
+							'email' => $email,
+						]
+					);
+				return $user = $stmt->fetch(PDO::FETCH_ASSOC);
+	}
 	
 	public function editProfile()
 	{
@@ -43,7 +62,7 @@ class UserProfile
 	
 	}
 				
-	if ($_POST['edit-username'] !== $_SESSION['account']['username'] && $_POST['edit-email' != null])
+	if ($_POST['edit-username'] !== $_SESSION['account']['username'] && $_POST['edit-username'] != null)
 	{
 		$newUsername = trim ($_POST['edit-username']);
 		$this->validateUsername($newUsername);
@@ -55,28 +74,32 @@ class UserProfile
 
 	if( !empty ($SESSION['Edit-Profile-Errors']))
 	{
-		header("location: Root/views/profile.php");
+		header("location: /views/profile.php");
 		exit;
 	}
 	try
 	{
-		$query = "UPDATE users SET (username, email, password) values (:username, :email, :password)";
+		$query = "UPDATE users SET username = :username, email = :email , password = :password  WHERE ID = :id";
 		$stmt = $this->pdo->prepare($query);
 		$stmt->execute
 			(
 				[
 					'username' => $newUsername,
 					'email' => $newEmail,
-					'password' => $password
+					'password' => $password,
+					'id' => $_SESSION['account']['ID']
 				]
 			);
-		$_SESSION['Edit-Profile-State'] = "profile edited successfully";
+
+		$account = $this->getUser($newEmail);
+		 $_SESSION['account'] = $account;
+		 $_SESSION['Edit-Profile-State'] = "profile edited successfully";
+		header("location: /views/profile.php");
 		exit;
 	}
 	catch(PDOException $e)
 	{
-		$_SESSION['Edit-Profile-State'] = "unexpected error happened";
-		exit;
+		echo $e;
 	}
 
 
@@ -85,54 +108,62 @@ class UserProfile
 	{	
 		if (! isset($_POST['password']))
 		{
-			$this->errors['password'] = "enter a password";
-			return $_SESSION['Edit-Profile-Errors'] = $this->errors;
-
-		}
+        $this->errors['password'] = "Enter a password";
+        $_SESSION['validationError'] = $this->errors;
+        return ;
+    	}
 		if (! isset($_POST['confirmPassword']))
 		{
 			$this->errors['password'] = "confirm the password";
-			return $_SESSION['Edit-Profile-Errors'] = $this->errors;
+			 $_SESSION['validationError'] = $this->errors;
+			 return;
 
 		}
 		if ($password !== $confirmPassWD)
 		{
 			$this->errors['password'] = 'enter the password correctly';
-			return $_SESSION['Edit-Profile-Errors'] = $this->errors;
+			 $_SESSION['validationError'] = $this->errors;
 
+			 return;
 		}
 		if (strpbrk($password ,"';\\<>&%!|#$") !== false)
 		{
 			$this->errors['password'] = " password can't have any of these chrchters \"';\\<>&%!|#$";
-			return $_SESSION['Edit-Profile-Errors'] = $this->errors;
+			 $_SESSION['validationError'] = $this->errors;
+			 return;
 
 		}
 		if (strlen($password)< 6)
 		{
 			$this->errors['password'] = "password is too short must be at least 6" ;
-			return $_SESSION['Edit-Profile-Errors'] = $this->errors;
+			 $_SESSION['validationError'] = $this->errors;
+			 return;
 
 		}
 
 		if (strlen($password)>16)
 		{
 			$this->errors['password'] = "password is too long" ;
-			return $_SESSION['Edit-Profile-Errors'] = $this->errors;
+			 $_SESSION['validationError'] = $this->errors;
+			 return;
 
 		}
+
 	}
 	public function validateEmail($email)
 	{
 		if (! isset($_POST['email']))
 		{
 			$this->errors['email'] = "email required";
-			return $_SESSION['Edit-Profile-Errors'] = $this->errors;;
+			$_SESSION['validationError'] = $this->errors;
+			return;
 
 		}
 		if (! filter_var($email, FILTER_VALIDATE_EMAIL))
 		{
 			$this->errors['email'] = "enter valid email";
-			return $_SESSION['Edit-Profile-Errors'] = $this->errors;;
+			$_SESSION['validationError'] = $this->errors;;
+			return;
 		}
 		$query = "SELECT email FROM users WHERE email = :email";
 		$stmt = $this->pdo->prepare($query);
@@ -145,12 +176,14 @@ class UserProfile
 		if (($stmt->fetch()) !=false)
 		{
 			$this->errors['email'] = "email already exist";
-			return $_SESSION['Edit-Profile-Errors'] = $this->errors;;
+			$_SESSION['validationError'] = $this->errors;;
+			return;
 		}
 		if (strpbrk($email , "\"';\\<>&%!|#$") !== false)
 		{
 			$this->errors['email'] = "email can't have these \"';\\<>&%!|#$ charchters";
-			return $_SESSION['Edit-Profile-Errors'] = $this->errors;;
+			$_SESSION['validationError'] = $this->errors;;
+			return;
 		}
 
 
@@ -162,13 +195,15 @@ class UserProfile
 		if (! isset($_POST['username']))
 		{
 				$this->errors['username'] = "email required";
-				return $_SESSION['Edit-Profile-Errors'] = $this->errors;;
+				 $_SESSION['validationError'] = $this->errors;
+				 return;
 				
 		}
 		if (strpbrk($username , "\"';\\<>&%!|#$") !== false)
 		{
 			$this->errors['username'] = "username can't have these \"';\\<>&%!|#$ charchters";
-			return $_SESSION['Edit-Profile-Errors'] = $this->errors;;
+			 $_SESSION['validationError'] = $this->errors;
+			 return;
 		}
 
 		$query = "SELECT username FROM users WHERE username = :username";
@@ -182,16 +217,17 @@ class UserProfile
 		if (($stmt->fetch()) != false)
 		{
 			$this->errors['username'] = "username already exist";
-			return $_SESSION['Edit-Profile-Errors'] = $this->errors;;
+			 $_SESSION['validationError'] = $this->errors;
+			 return;
 		}
 	if (strlen($username)>16)
 		{
 			$errors['username'] = "username is too long" ;
-			return $_SESSION['Edit-Profile-Errors'] = $this->errors;;
+			 $_SESSION['validationError'] = $this->errors;
+			 return;
 		}
 		return true;
 	}
-
 
 /*
 	public function editPassword($oldPasswd, $newPasswd)
