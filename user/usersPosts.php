@@ -1,6 +1,11 @@
 <?php
-
+if (session_status() !== PHP_SESSION_ACTIVE)
+{
+session_start();
+}
 require_once __DIR__.'/../core/DB.php';
+require_once __DIR__."/../core/config.php";
+
 class UserPosts
 {
 
@@ -51,12 +56,34 @@ class UserPosts
 	}
 	public function getCategories()
 	{
+		try
+		{
 		$query = "SELECT * FROM categories";
 		$stmt = $this->pdo->prepare($query);
 		$stmt->execute();
-		return $stmt->fetch();
+		return $stmt->fetchAll(PDO::FETCH_ASSOC);
+	       	}
+		catch (PDOException $e)
+		{
+		return "unexpexted error";
+		}
+	}
+
+	public function categoryPosts($categoryId)
+	{
+		$query = "SELECT posts.*, users.username, categories.category_name FROM posts JOIN users ON posts.user_id = users.ID JOIN categories ON posts.category_id = categories.category_id WHERE categories.category_id = :categoryId";
+		$stmt = $this->pdo->prepare($query);
+		$stmt->execute
+			(
+				[
+					'categoryId' => $categoryId
+				]
+			);
+		return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 	}
 	//get author data
+
 	public function getAuthor($authorId)
 	{
 		$query = "SELECT * FROM users WHERE ID = :authorId";
@@ -67,7 +94,7 @@ class UserPosts
 					'authorId' => $authorId
 				]
 			);
-		return $stmt->fetch();
+		return $stmt->fetch(PDO::FETCH_ASSOC);
 	}
 
 	//get id of the category
@@ -82,7 +109,7 @@ class UserPosts
 						'categoryName' => $categoryName
 					]
 				);
-			$categoryId =$stmt->fetch();
+			$categoryId =$stmt->fetch(PDO::FETCH_ASSOC);
 			if ($categoryId)
 			{
 				return $categoryId;
@@ -114,16 +141,15 @@ class UserPosts
 
 
 	//create new post
-	public function createPost($title, $status, $content, $userId, $categoryName)
+	public function createPost($title, $status, $content, $userId, $categoryName = "Uncategorized")
 	{
-		if ($userId)
-		{
 			$categoryId = $this->getCategoryId($categoryName);
-			if (is_int($categoryId))
+			if ($categoryId)
 			{
+			$categoryId = $categoryId['category_id'];
 				try
 				{
-					$query = "INSERT INTO posts (title , status, content, user_id, category_id) VALUES (:title, :status, :content, :user_id, category_id)";
+					$query = "INSERT INTO posts (title , status, content, user_id, category_id) VALUES (:title, :status, :content, :user_id, :category_id)";
 					$stmt = $this->pdo->prepare($query);
 					$stmt->execute
 						(
@@ -143,9 +169,6 @@ class UserPosts
 				}
 			}
 			return $categoryId;
-
-		}
-		return "log in to create a post";
 	}
 	
 	//delete post
@@ -171,6 +194,7 @@ class UserPosts
 	public function editPost($authorUsername, $postId, $title, $content, $categoryName, $status)
 	{
 		$categoryId = $this->getCategoryId($categoryName);
+		$categoryId = $categoryId['category_id'];
 
 		if ($authorUsername === $_SESSION['account']['username'])
 		{
@@ -183,13 +207,15 @@ class UserPosts
 					'title'	=> $title,
 					'content' => $content,
 					'status' => $status,
-					'category_id' => $categoryId
+					'category_id' => $categoryId,
+					'postId' => $postId
 				]
 			);
 			return "post edited succefully";
 			}
 			catch(PDOException $e)
 			{
+				echo $e;
 			return "unexpected error happened";
 			}
 		}
@@ -198,6 +224,9 @@ class UserPosts
 	//read one post
 	public function readPost($postId)
 	{
+		try
+		{
+
 		$query = "SELECT posts.* , users.username, categories.category_name FROM posts JOIN users ON posts.user_id = users.ID JOIN categories ON posts.category_id = categories.category_id WHERE post_id = :id";
 		$stmt = $this->pdo->prepare($query);
 		$stmt->execute
@@ -206,6 +235,22 @@ class UserPosts
 					'id' => $postId
 				]
 			);
-		return $stmt->fetch();
+		$posts = $stmt->fetch(PDO::FETCH_ASSOC);
+		if (count($posts) > 0)
+		{
+
+			return $posts;
+		}
+		else
+		{
+			header('location: /views/home.php');
+			return;
+		}
+		}
+		catch (PDOException $e)
+		{
+			return "unexepected Error";
+
+		}
 	}
 }
