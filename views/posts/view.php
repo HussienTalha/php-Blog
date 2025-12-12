@@ -20,12 +20,13 @@ require_once __DIR__.'/../layouts/main.php';
 	
 	<?php if (isset($_SESSION['account']) && ($_SESSION['account']['username'] === $post['username'])): ?>
 	<div class="post-actions">
-		<a href="<?=Root?>/views/posts/edit.php?postId=<?=$postId;?>" class="btn">Edit Post</a>
+		<a href="<?=Root?>/views/posts/edit.php?postId=<?=$postId;?>" class="btn btn-primary">Edit Post</a>
+		<?php endif; ?>
 		<?php if ($_SESSION['account']['admin'] || ($_SESSION['account']['username'] === $post['username'])): ?>
 		<a href="<?=Root?>/views/posts/delete.php?postId=<?=$postId;?>" class="btn btn-danger">Delete Post</a>
 		<?php endif; ?>
 	</div>
-	<?php endif; ?>
+	
 
 	<div class="post-image mb-4">
 		<img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&amp;w=870&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" class="img-fluid rounded" alt="Post Image"/>

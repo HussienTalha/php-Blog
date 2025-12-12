@@ -174,7 +174,7 @@ class UserPosts
 	//delete post
 	public function deletePost($postId,$authorUsername)
 	{
-		if ($authorUsername === $_SESSION['account']['username']) 
+		if ($authorUsername === $_SESSION['account']['username']||$_SESSION['account']['admin']) 
 		{
 			$query = "DELETE FROM posts WHERE post_id = :postId";
 			$stmt = $this->pdo->prepare($query);
