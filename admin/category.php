@@ -29,6 +29,8 @@ class Category
 
 	public function addCategory($categoryName)
 	{
+	$categoryName = strtolower($categoryName);
+	$categoryName = ucwords($categoryName);
 		if ($this->validateAdmin())
 		{
 			try
@@ -61,6 +63,7 @@ class Category
 
 	public function deleteCategory($categoryName)
 	{
+		
 		if ($this->validateAdmin())
 		{
 			try
@@ -96,6 +99,8 @@ class Category
 
 	public function editCategory($oldCategory , $newCategory)
 	{
+	$categoryName = strtolower($categoryName);
+	$categoryName = ucwords($categoryName);
 		if ($this->validateAdmin())
 		{
 			if ($oldCategory === $newCategory)
