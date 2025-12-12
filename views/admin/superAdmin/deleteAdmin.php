@@ -4,7 +4,8 @@ require_once __DIR__."/../../../core/CSRF.php";
 
 if (empty( $_SESSION['account'])  || ! $_SESSION['account']['superAdmin'])
 {
-	header('location:'.Root.'views/home.php');
+	header('location:'.Root.'/views/home.php');
+
 	exit;
 }
 $CSRF = new CSRF;
