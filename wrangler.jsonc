@@ -1,0 +1,18 @@
+{
+  "name": "blog-application",
+  "main": "public/index.php",  // Entry point
+  "compatibility_date": "2025-01-01",
+  
+  "build": {
+    "command": "echo 'PHP app - no JavaScript build needed'",
+    "cwd": "."
+  },
+  
+  "rules": [
+    {
+      "type": "StaticAssets",
+      "globs": ["public/**/*"],
+      "base_dir": "public"
+    }
+  ]
+}
