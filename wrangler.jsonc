@@ -1,18 +1,14 @@
 {
-  "name": "blog-application",
-  "main": "public/index.php",  // Entry point
+  "name": "blog-static",
+  "main": "public/index.html",
   "compatibility_date": "2025-01-01",
   
   "build": {
-    "command": "echo 'PHP app - no JavaScript build needed'",
-    "cwd": "."
+    "command": "echo 'Deploying static files'"
   },
   
-  "rules": [
-    {
-      "type": "StaticAssets",
-      "globs": ["public/**/*"],
-      "base_dir": "public"
-    }
-  ]
+  "site": {
+    "bucket": "./public",
+    "entry-point": "./public"
+  }
 }
