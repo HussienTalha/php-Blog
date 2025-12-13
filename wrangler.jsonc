@@ -1,6 +1,6 @@
 {
   "name": "blog-static",
-  "main": "public/index.php",
+  "main": "index.php",
   "compatibility_date": "2025-01-01",
   
   "build": {
