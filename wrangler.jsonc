@@ -8,7 +8,6 @@
   },
   
   "site": {
-    "bucket": "./public",
-    "entry-point": "./public"
-  }
+    "bucket": "./public"
+  } 
 }
