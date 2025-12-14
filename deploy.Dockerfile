@@ -1,18 +1,12 @@
-FROM php:8.2-fpm-alpine
-
-# Install Nginx
-RUN apk add --no-cache nginx
+FROM php:8.2-cli-alpine
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql
 
-# Copy project files
+# Copy project
 COPY . /var/www/html
+WORKDIR /var/www/html
 
-# Replace the ENTIRE nginx config (not just conf.d)
-COPY nginx.prod.conf /etc/nginx/nginx.conf
-
-# Start services
-CMD sh -c "php-fpm -D && nginx -g 'daemon off;'"
-
-EXPOSE 80
+# Expose port and run PHP built-in server
+EXPOSE 8000
+CMD ["php", "-S", "0.0.0.0:8000", "-t", "public"]
