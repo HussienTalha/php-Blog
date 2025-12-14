@@ -19,4 +19,13 @@ RUN curl -sS https://getcomposer.org/installer | php -- \
 
 WORKDIR /var/www/html
 
+# Copy from project root (context is . which is project root)
+# Use relative paths from project root
+COPY ./src/ /var/www/html/
+COPY ./composer.json /var/www/html/composer.json  # if exists
+
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html
+RUN chmod -R 755 /var/www/html
+
 CMD ["php-fpm", "-F"]
