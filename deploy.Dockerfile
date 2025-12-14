@@ -9,10 +9,13 @@ RUN docker-php-ext-install pdo pdo_mysql
 # Copy project files
 COPY . /var/www/html
 
-# Copy PRODUCTION nginx config (from root)
+# Remove default nginx config to avoid conflict
+RUN rm -f /etc/nginx/conf.d/default.conf
+
+# Copy our simple nginx config
 COPY nginx.prod.conf /etc/nginx/conf.d/default.conf
 
-# Start both services
+# Start services
 CMD sh -c "php-fpm -D && nginx -g 'daemon off;'"
 
 EXPOSE 80
