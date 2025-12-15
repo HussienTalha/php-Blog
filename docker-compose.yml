@@ -3,13 +3,13 @@ version: '3.8'
 services:
   app:
     build:
-      context: ".."
-      dockerfile: docker/Dockerfile
+      context: .
+      dockerfile: Dockerfile
     container_name: blog-app
     restart: always
     working_dir: /var/www/
     volumes:
-      - ../:/var/www
+      - ./:/var/www
     ports:
       - "9000:9000"  
     networks:
@@ -22,8 +22,8 @@ services:
     ports:
       - 8000:80
     volumes:
-      - ../:/var/www
-      - ./nginx:/etc/nginx/conf.d
+      - ./:/var/www
+      - ./docker/nginx:/etc/nginx/conf.d
     depends_on:
       - app
     networks:
@@ -39,8 +39,8 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./storage/mysql:/var/run/mysqld
-      - ./storage/mysql_data:/var/lib/mysql 
+      - ./docker/storage/mysql:/var/run/mysqld
+      - ./docker/storage/mysql_data:/var/lib/mysql 
     networks:
       - app-network
   
