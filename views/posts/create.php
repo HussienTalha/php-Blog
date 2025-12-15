@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
 		 'created',
 		 $_POST['content'],
 		 $_SESSION['account']['ID'],
-		 'drama'
+		 $_POST['category']
 		);
 	$_SESSION['state'] = $state;
 	}
