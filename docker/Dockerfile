@@ -1,31 +1,9 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.0.2-fpm
 
-RUN apk add --no-cache \
-    curl \
-    git \
-    unzip \
-    libzip-dev \
-    libpng-dev \
-    freetype-dev \
-    oniguruma-dev \
-    libxml2-dev \
-    jpeg-dev
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
-docker-php-ext-install pdo pdo_mysql gd zip mbstring
+RUN docker-php-ext-install pdo pdo_mysql
 
-RUN curl -sS https://getcomposer.org/installer | php -- \
-    --install-dir=/usr/local/bin --filename=composer
-
-WORKDIR /var/www/html
-
-# Copy from project root (context is . which is project root)
-# Use relative paths from project root
-COPY ./src/ /var/www/html/
-COPY ./composer.json /var/www/html/composer.json  # if exists
-
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html
-RUN chmod -R 755 /var/www/html
+WORKDIR /var/www
 
 CMD ["php-fpm", "-F"]
