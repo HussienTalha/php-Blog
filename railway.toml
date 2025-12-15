@@ -1,0 +1,12 @@
+# railway.toml at project root
+[build]
+builder = "DOCKER"
+dockerfilePath = "docker/Dockerfile"
+composeFile = "docker/docker-compose.yml"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+numReplicas = 1
+
+
