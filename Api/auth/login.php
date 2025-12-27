@@ -6,22 +6,29 @@ session_start();
 
 require_once __DIR__.'/../core/DB.php';
 require_once __DIR__."/../core/config.php";
+require_once __DIR__.'/JWT.php';
 
 class Login
 {
 
 		public DB $db;
 		public pdo $pdo;
+		public $data;
+
+		public $jwt;
 		public function __construct()
 		{
 			$this->db = new DB();
 			$this->pdo = $this->db->getConnection();
+			$this->jwt = new JWT();
+			$this->data = json_decode(file_get_contents('php://input'),true);
 		}
 
+	
 		public function getUser()
 		{
-			$email = trim($_POST['email']);
-			$password = trim($_POST['password']);
+			$email = trim($this->data['email']);
+			$password = trim($this->data['password']);
 
 			try
 			{
@@ -36,39 +43,65 @@ class Login
 				$user = $stmt->fetch(PDO::FETCH_ASSOC);
 				if (! $user)
 				{
-					$_SESSION['error'] = "wrong email" ;
-					header("location: login.php");
-					exit;
+					http_response_code(400);
+					header('content-type: application/json');
+					return json_encode
+						(
+							[
+								'messege' => 'wrong email'
+							]
+						);
 				}
 				else
 				{
 					$pass = password_verify($password, $user['password']);
 					if (! $pass)
 					{
-						$_SESSION['error'] = "wrong password";
-						header("location: login.php");
-						exit;
+						http_response_code(400);
+						header('content-type: application/json');
+						return json_encode
+							(
+								[
+									'messege' => 'wrong password'
+								]
+						);
 					}
 					else
 					{
-						$_SESSION['account'] = $user;
-						if ($_SESSION['account']['admin'])
-						{
-							header("location: dashboard.php");
-							exit;
-						}
-						else
-							header("location: home.php");
-							echo $_SESSION['account'];
-						exit;
+						$token = $this->jwt->createToken($user);
+						$_SESSION['toke'] = $token;
+						header('content-type: Application/json');
+						http_response_code(200);
+						return json_encode
+							(
+								[
+									'data' =>
+								       		[
+											'token' => $token,
+											'username' => $user['username'],
+											'id' => $user['ID']
+	
+											],
+									'messege'=> 'user logged in',
+									'errors' => null
+
+								
+								]
+							);
 					}
 				}
 			}
 			catch (PDOException $e)
 			{
-				$_SESSION['error'] =  "unexpected error $e";
-				header("location: login.php");
-				exit;
+						header('content-type: Application/json');
+						http_response_code(400);
+						return json_encode
+							(
+								[
+									'messege'=> 'something went wrong',
+									'errors' => $e
+								]
+							);
 			}
 		}
 
