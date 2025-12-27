@@ -1,10 +1,7 @@
 <?php
-if (session_status() !== PHP_SESSION_ACTIVE)
-{
-session_start();
-}
 require_once __DIR__.'/../core/DB.php';
 require_once __DIR__."/../core/config.php";
+require_once __DIR__.'/JWT.php';
 
 class Register
 {
@@ -19,41 +16,26 @@ class Register
 
 	public function createUser()
 	{	
-		$username = trim($_POST['username']);
-		$email = trim($_POST['email']);
-		$passwd =trim($_POST['password']);
-		$confirmPW = trim($_POST['confirmPassword']);
+		$data = json_decode(file_get_contents('php://input'));
+		$username = trim($data['username']);
+		$email = trim($data['email']);
+		$passwd =trim($data['password']);
+		$confirmPW = trim($data['confirmPassword']);
 		
 
 		$this->validatePassword($passwd, $confirmPW);
 		$this->validateEmail($email);
 		$this->validateUsername($username);
-/*
-		if (! $this->validatePassword($passwd, $confirmPW))
+		if (! empty ($errors))
 		{
-		
-			$_SESSION['validationError'] = $this->errors;
-			header ("location : /views/register.php");
-			return ;
-		}
-		if (! $this->validateEmail($email))
-		{
-
-			$_SESSION['validationError'] = $this->errors;
-			header ("location :/views/register.php");
-			return ;
-		}
-		if (! $this->validateUsername($username))
-		{	
-			$_SESSION['validationError'] = $this->errors;
-			header ("location :/views/register.php");
-			return ;
-		}
-		 */
-		if (! empty ($_SESSION['validationError']))
-		{
-			header ("location: register.php");
-			exit ;
+			http_response_code(400);
+			header('content-type: application/json');
+			return json_encode(
+				[
+				'messege' => 'error in registeration',
+				'errors' => $errors
+				]
+				);
 		}
 		$passwd = password_hash($passwd, PASSWORD_DEFAULT);
 
@@ -69,26 +51,36 @@ class Register
 						'password' => $passwd,
 						]
 				);
-			$_SESSION['state'] = 'user created successully you can now log in';
-			header("location: login.php");
-			exit;
+			$id = $this->pdo->lastInsertId();
+			http_response_code(200);
+			header('content-type: application/json');
+			return json_encode(
+				[
+				       'messege' => "user created successully with id $id",
+				]
+				);
 		}
 		catch (PDOException $e)
 		{
-			$_SESSION['state'] ="unexpected error";
-			header("location : register.php");
-			exit;	
+			http_response_code(400);
+			return json_encode
+				(
+					[
+						'messege' => 'unexpected error happened try again',
+						'error' => $e	
+					]
+				);	
 		}
 	}
 	public function validatePassword($password, $confirmPassWD)
 	{	
-		if (! isset($_POST['password']))
+		if (! isset($data['password']))
 		{
         $this->errors['password'] = "Enter a password";
         $_SESSION['validationError'] = $this->errors;
         return ;
     	}
-		if (! isset($_POST['confirmPassword']))
+		if (! isset($data['confirmPassword']))
 		{
 			$this->errors['password'] = "confirm the password";
 			 $_SESSION['validationError'] = $this->errors;
@@ -128,7 +120,7 @@ class Register
 	}
 	public function validateEmail($email)
 	{
-		if (! isset($_POST['email']))
+		if (! isset($data['email']))
 		{
 			$this->errors['email'] = "email required";
 			$_SESSION['validationError'] = $this->errors;
@@ -168,7 +160,7 @@ class Register
 	}
 	public function validateUsername($username)
 	{	
-		if (! isset($_POST['username']))
+		if (! isset($data['username']))
 		{
 				$this->errors['username'] = "email required";
 				 $_SESSION['validationError'] = $this->errors;
